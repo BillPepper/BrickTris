@@ -1,0 +1,14 @@
+{
+  "name": "bricktris",
+  "version": "1.0.0",
+  "description": "",
+  "main": "game.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mattes Wenzel",
+  "license": "ISC",
+  "dependencies": {
+    "p5": "^0.8.0"
+  }
+}
