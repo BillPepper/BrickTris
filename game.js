@@ -1,17 +1,24 @@
-const resolution = {width: 400, height: 400}
-const barSize = {width: 50, height: 10, padding: 5}
+const resolution = { width: 400, height: 400 }
+const barSize = { width: 50, height: 10, padding: 5 }
 
 let bars = [
-  {x: 5, y: 5, width: 50, height: 10, active: true},
-  {x: 60, y: 15, width: 50, height: 10, active: false},
-  {x: 115, y: 5, width: 50, height: 10, active: true},
-  {x: 170, y: 15, width: 50, height: 10, active: true},
-  {x: 225, y: 5, width: 50, height: 10, active: true},
-  {x: 280, y: 15, width: 50, height: 10, active: true},
-  {x: 335, y: 5, width: 50, height: 10, active: true}
+  { x: 5, y: 5, width: 50, height: 10, active: true },
+  { x: 60, y: 15, width: 50, height: 10, active: false },
+  { x: 115, y: 5, width: 50, height: 10, active: true },
+  { x: 170, y: 15, width: 50, height: 10, active: true },
+  { x: 225, y: 5, width: 50, height: 10, active: true },
+  { x: 280, y: 15, width: 50, height: 10, active: true },
+  { x: 335, y: 5, width: 50, height: 10, active: true }
 ]
-let bar = {x: 100, y: 345, width: 50, height: 10}
-let ball = {x: bar.x + bar.width / 2, y: 345 - 6, speed: 4, speedX: 0, speedY: 0, size: 10}
+let bar = { x: 100, y: 345, width: 50, height: 10 }
+let ball = {
+  x: bar.x + bar.width / 2,
+  y: 345 - 6,
+  speed: 4,
+  speedX: 0,
+  speedY: 0,
+  size: 10
+}
 
 let settings = {
   bottomBounce: false,
@@ -24,17 +31,18 @@ let gameState = {
   started: false,
   won: false,
   lost: false,
-  paused: false
+  paused: false,
+  ballState: { speedX: 0, speedY: 0 }
 }
 
 function setup() {
-  createCanvas(resolution.width, resolution.height);
+  createCanvas(resolution.width, resolution.height)
   frameRate(60)
 }
 
 function draw() {
-  background(60);
-  
+  background(60)
+
   updateDebug()
   updateBars()
   updateBar()
@@ -44,78 +52,78 @@ function draw() {
   updateGfx()
 }
 
-function updateBall(){
-  if (!gameState.started && !settings.barFrozen){
+function updateBall() {
+  if (!gameState.started && !settings.barFrozen) {
     ellipse(mouseX, 345 - ball.size / 2, ball.size, ball.size)
   } else {
     ellipse(ball.x, ball.y, ball.size, ball.size)
-    
-    if (ball.y < ball.size / 2){
+
+    if (ball.y < ball.size / 2) {
       ball.speedY = ball.speedY * -1
     }
-    
+
     // dont forget to freeze all entities when game is over
-    if (checkCollision(ball, bar)){
+    if (checkCollision(ball, bar)) {
       ball.speedY = ball.speedY * -1
       const ballHitPos = ball.x - bar.x
-      
-      if (ballHitPos > 25){
+
+      if (ballHitPos > 25) {
         ball.speedX = 1.5
       }
-      
-      if (ballHitPos < 25){
+
+      if (ballHitPos < 25) {
         ball.speedX = -1.5
       }
     }
-    
-    if (settings.bottomBounce){
-      if (ball.y > resolution.height - ball.size / 2){
+
+    if (settings.bottomBounce) {
+      if (ball.y > resolution.height - ball.size / 2) {
         ball.speedY = ball.speedY * -1
-      } 
+      }
     }
-    
-    if (ball.x < ball.size / 2 || ball.x > resolution.width - ball.size / 2){
+
+    if (ball.x < ball.size / 2 || ball.x > resolution.width - ball.size / 2) {
       ball.speedX = ball.speedX * -1
     }
-    
+
     ball.y += ball.speedY
     ball.x += ball.speedX
   }
 }
 
-function updateBar(){
-  if (!settings.barFrozen){
+function updateBar() {
+  if (!settings.barFrozen) {
     bar.x = mouseX - 25
   }
   rect(bar.x, bar.y, bar.width, bar.height)
 }
 
-function updateBars(){
-  for (let i = 0; i < bars.length; i++){
+function updateBars() {
+  for (let i = 0; i < bars.length; i++) {
     if (bars[i].active) {
       rect(bars[i].x, bars[i].y, bars[i].width, bars[i].height)
     }
   }
 }
 
-function updateGameState(){
-  if (ball.y > resolution.height + ball.size){
+function updateGameState() {
+  if (ball.y > resolution.height + ball.size) {
     gameState.lost = true
   }
 }
 
-function updateGfx(){
+function updateGfx() {
   if (gameState.lost) {
-    text('Game Over', resolution.width / 2 -50, resolution.height / 2)
+    text('Game Over', resolution.width / 2 - 50, resolution.height / 2)
   }
 }
 
-function updateCollisions(){
-  for (let i = 0; i < bars.length;i++){
-    if (bars[i].active){
-      if (checkCollision(ball, bars[i])){
+function updateCollisions() {
+  for (let i = 0; i < bars.length; i++) {
+    if (bars[i].active) {
+      if (checkCollision(ball, bars[i])) {
         ball.speedY = ball.speedY * -1
-        if (!settings.barsFrozen){
+        if (!settings.barsFrozen) {
           bars[i].active = false
         }
       }
@@ -123,25 +131,42 @@ function updateCollisions(){
   }
 }
 
-function checkCollision(objOne, objTwo){
-  if ((objOne.x >= objTwo.x - ball.size / 2 && objOne.x <= objTwo.x + objTwo.width + ball.size / 2) && 
-      (objOne.y >= objTwo.y - ball.size / 2 && objOne.y <= objTwo.y + objTwo.height + ball.size / 2)){
-    
-    
+function pauseGame() {
+  console.log('pause')
+  if (!gameState.paused) {
+    gameState.ballState.speedX = ball.speedX
+    gameState.ballState.speedY = ball.speedY
+    ball.speedX = 0
+    ball.speedY = 0
+    settings.barFrozen = true
+    gameState.paused = true
+  } else {
+    ball.speedX = gameState.ballState.speedX
+    ball.speedY = gameState.ballState.speedY
+    settings.barFrozen = false
+    gameState.paused = false
+  }
+}
+
+function checkCollision(objOne, objTwo) {
+  if (
+    objOne.x >= objTwo.x - ball.size / 2 &&
+    objOne.x <= objTwo.x + objTwo.width + ball.size / 2 &&
+    (objOne.y >= objTwo.y - ball.size / 2 &&
+      objOne.y <= objTwo.y + objTwo.height + ball.size / 2)
+  ) {
     console.log('smack!')
-    
+
     return true
   }
 }
 
-function restartGame(){
+function restartGame() {
   gameState.started = false
   gameState.lost = false
 }
 
-
-
-function renderDebug(){
+function renderDebug() {
   text('speedX: ' + ball.speedX, 5, 50)
   text('speedY: ' + ball.speedY, 5, 60)
   text('ball.x: ' + ball.x, 5, 70)
@@ -152,11 +177,11 @@ function renderDebug(){
   text('state.lost: ' + gameState.lost, 5, 130)
 }
 
-function updateDebug(){
-  if (settings.debug){
+function updateDebug() {
+  if (settings.debug) {
     renderDebug()
   }
-  
+
   if (keyIsDown(ENTER)) {
     ball.speedX = 0
     ball.speedY = 0
@@ -176,13 +201,16 @@ function updateDebug(){
 }
 
 function mouseReleased() {
-  if (!gameState.started){
+  if (!gameState.started) {
     ball.x = mouseX
     ball.speedY = ball.speed * -1
   }
-  
+
   gameState.started = true
-  
 }
 
-
+function keyReleased(key) {
+  if (key.keyCode === ESCAPE) {
+    pauseGame()
+  }
+}
